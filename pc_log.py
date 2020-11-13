@@ -56,7 +56,8 @@ class parser_handle(threading.Thread):
         self.win.mainloop()
 
     def create_excel_file(self):
-        self.excel_book = xlsxwriter.Workbook(os.path.join(os.getcwd(), '发生邻道交易嫌疑车辆.xlsx'))
+        date_tmp = time.strftime("%Y-%m-%d_%H_%M_%S", time.localtime())
+        self.excel_book = xlsxwriter.Workbook(os.path.join(os.getcwd(), '发生邻道交易嫌疑车辆_' + date_tmp + '.xlsx'))
         # exel标题正文的一些样式设置
         style_setting = excel_style()
         self.style_head = style_setting.get_highest_head_style(self.excel_book.add_format())
@@ -129,13 +130,17 @@ class parser_handle(threading.Thread):
     def parse_records(self):
         self.column_cnt = 0  #纵列
         write_account = dict()
+        old_plate = ''  #已经记录过的车牌
         if self.records['ETC'] and self.records['MTC']:
             for record in self.records['ETC']:
                 for reference in self.records['MTC']:
-                    if record.plate_num == reference.plate_num and record.lane_name != reference.lane_name:
+                    if (record.plate_num == reference.plate_num) \
+                            and (record.lane_name != reference.lane_name)\
+                            and (record.plate_num != old_plate):
                         time1 = str2ms(record.date_time)
                         time2 = str2ms(reference.date_time)
-                        if abs(time1 - time2) < 20*1000:  #20秒内
+                        if abs(time1 - time2) < 60*1000:  #60秒内
+                            old_plate = record.plate_num
                             if record.lane_name in write_account:
                                 write_account[record.lane_name] += 1
                                 row = write_account[record.lane_name]

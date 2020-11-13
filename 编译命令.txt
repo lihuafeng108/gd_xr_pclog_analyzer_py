@@ -1,0 +1,1 @@
+pyinstaller -Fw pc_log.py excel_style.py
