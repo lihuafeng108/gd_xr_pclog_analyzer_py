@@ -1,3 +1,6 @@
+#
+#筛选思路：ETC车道所有交易成功的OBU，从隔壁的混合车道查找所有的车牌识别的过车信息，是否在短时间内（1 min）有记录，有的话则一辆有嫌疑发生邻道干扰的车辆
+#
 import os
 import tkinter as tk
 import fnmatch
